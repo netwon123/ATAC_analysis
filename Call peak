@@ -1,0 +1,31 @@
+fastqc -o ./ shangNC-1.trim_1P.fq.gz
+
+#去接头Trimmomatic-0.39
+java -jar /public/home/baoqi/atac/software/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 16 -summary shangNC-1.trim.stats \
+-validatePairs -baseout shangNC-1.trim.fq.gz shangNC-1_FKDL210176569-1a_1.fq.gz shangNC-1_FKDL210176569-1a_2.fq.gz \
+ ILLUMINACLIP:/public/home/baoqi/atac/software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10:8:true MINLEN:8 HEADCROP:15
+
+fastqc -o ./ shangNC-1.trim_1P.fq.gz
+
+
+#比对
+bowtie2-build -f Duroc.fna Duroc
+bowtie2 -p 16 -q -X 1000 --dovetail --no-unal --very-sensitive-local --no-mixed --no-discordant \
+-x ../ref/Duroc -1 shangNC-1.trim_1P.fq.gz -2 shangNC-1.trim_2P.fq.gz > shangNC-1.sam
+
+
+~/software/samtools-1.9/samtools view -F 4 -u shangNC-1.sam > shangNC-1.bam
+~/software/samtools-1.9/samtools sort -@ 8 -o shangNC-1_sort.bam shangNC-1.bam
+
+过滤
+~/software/samtools-1.9/samtools view -b -f 2 -q 30 -o shangNC-1_sort_f2q30.bam shangNC-1.bam
+
+
+v4.2.3.0
+gatk MarkDuplicates -I shangNC-1_sort_f2q30.bam -O shangNC-1_sort_f2q30_rmdup.bam  --REMOVE_SEQUENCING_DUPLICATES true -M shangNC-1.log
+
+过滤线粒体序列
+~/software/samtools-1.9/samtools view -h ../shangNC-1/shangNC-1_sort_f2q30_rmdup.bam | grep -v 'NC_000845.1' | ~/software/samtools-1.9/samtools view -bS -o shangNC-1.sort_f2q30_rmdup_rmM.bam
+
+v2.2.7.1
+macs2 callpeak -g 2533271056 -t shangNC-1_sort_f2q30_rmdup.bam -f BAMPE -n shangNC-1 -B --SPMR --keep-dup all 
