@@ -1,0 +1,45 @@
+library("ChIPseeker")
+library("GenomicFeatures")
+setwd('G:/博士/ATAC/peak_file/')
+# 利用gff文件制作注释
+ara_TxDb <- makeTxDbFromGFF('GCF_000003025.6_Sscrofa11.1_genomic.gff',format=c("gff3"))
+## 设置工作目录
+
+## 获取该文件夹（C:/Users/xuyu/Desktop/atac_data/atac_peak/）下所有的narrowPeak文件名
+files <- list.files(pattern = "*.narrowPeak")
+files_list <- as.list(files)
+names(files_list) <- c('shangNC-1','shangNC-2','shangNC-3','xiNC-1','xiNC-2','xiNC-3')
+
+## 对peak进行注释
+peakAnnoList <- lapply(files_list, annotatePeak, TxDb=ara_TxDb,
+                       tssRegion=c(-3000, 3000), verbose=FALSE)
+
+## 可视化多个样本peak和TSS之间距离的分布（见图38）
+plotDistToTSS(peakAnnoList,ylab = "Opening sites (%) (5'->3')",
+              title = paste0("Distribution of opening loci relative to TSS"))
+peakHeatmap(files_list, weightCol="V5", TxDb=ara_TxDb, 
+            upstream=1000, downstream=1000, 
+            color=rainbow(length(files)))
+
+#注释
+peakAnno=annotatePeak(peak='xiNC-3_peaks.narrowPeak',tssRegion =c(-3000,3000),TxDb=ara_TxDb,assignGenomicAnnotation = TRUE)
+pealresult=as.data.frame(peakAnno@anno)
+write.table(pealresult,file='xiNC-3_peaks.peakAnno.tsv',sep = '\t',row.names = FALSE)
+plotAnnoPie(peakAnno)
+
+#对交集peak进行注释
+library("ChIPseeker")
+library("GenomicFeatures")
+setwd('G:/博士/ATAC/peak_file/差异peak/')
+# 利用gff文件制作注释
+ara_TxDb <- makeTxDbFromGFF('G:/博士/ATAC/peak_file/GCF_000003025.6_Sscrofa11.1_genomic.gff',format=c("gff3"))
+## 设置工作目录
+
+peak=readPeakFile(peakfile ='shangNC_vs_xiNC_deseq2_sig.bed')
+peakAnoo=annotatePeak(
+  peak=peak,
+  tssRegion = c(-3000,3000),
+  TxDb = ara_TxDb)
+RESUT=as.data.frame(peakAnoo@anno)
+write.table(RESUT,file='shangNC_vs_xiNC.peakAnno.tsv',sep = '\t',row.names = FALSE)
+plotAnnoPie(peakAnoo)
