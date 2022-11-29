@@ -1,0 +1,17 @@
+library(DiffBind)
+
+
+setwd('G:/博士/ATAC/peak_file/差异2/')
+samples=read.csv('samplelist.txt',sep='\t')
+dbObj =dba(sampleSheet = samples)
+
+
+dbObj <- dba.count(dbObj, bUseSummarizeOverlaps=TRUE)
+
+
+#------------------------------所有样本做PCA
+dba.plotPCA(dbObj,  attributes=DBA_FACTOR, label=DBA_ID)
+plot(dbObj)
+#------------------------------样本之间的交集做韦恩图
+
+dba.plotVenn(dbObj,mask=dbObj$masks)
