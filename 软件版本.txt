@@ -1,0 +1,50 @@
+#检查接头、GC是否对等
+fastqc -o ./ shangNC-1.trim_1P.fq.gz
+
+#去接头Trimmomatic-0.39
+java -jar /public/home/baoqi/atac/software/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 16 -summary shangNC-1.trim.stats \
+-validatePairs -baseout shangNC-1.trim.fq.gz shangNC-1_FKDL210176569-1a_1.fq.gz shangNC-1_FKDL210176569-1a_2.fq.gz \
+ ILLUMINACLIP:/public/home/baoqi/atac/software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10:8:true MINLEN:8 HEADCROP:15
+
+fastqc -o ./ shangNC-1.trim_1P.fq.gz
+
+
+#比对
+bowtie2-build -f Duroc.fna Duroc
+bowtie2 -p 16 -q -X 1000 --dovetail --no-unal --very-sensitive-local --no-mixed --no-discordant \
+-x ../ref/Duroc -1 shangNC-1.trim_1P.fq.gz -2 shangNC-1.trim_2P.fq.gz > shangNC-1.sam
+
+
+~/software/samtools-1.9/samtools view -F 4 -u shangNC-1.sam > shangNC-1.bam
+~/software/samtools-1.9/samtools sort -@ 8 -o shangNC-1_sort.bam shangNC-1.bam
+
+过滤
+~/software/samtools-1.9/samtools view -b -f 2 -q 30 -o shangNC-1_sort_f2q30.bam shangNC-1.bam
+
+
+v4.2.3.0
+gatk MarkDuplicates -I shangNC-1_sort_f2q30.bam -O shangNC-1_sort_f2q30_rmdup.bam  --REMOVE_SEQUENCING_DUPLICATES true -M shangNC-1.log
+
+过滤线粒体序列
+线粒体DNA和叶绿体DNA序列。由于线粒体和叶绿体DNA是裸露的，可以被Tn5酶识别切割，因此数据中会有线粒体和叶绿体的污染，比对完之后需要去掉（如果是植物，还需要去掉叶绿体）
+~/software/samtools-1.9/samtools view -h ../shangNC-1/shangNC-1_sort_f2q30_rmdup.bam | grep -v 'NC_000845.1' | ~/software/samtools-1.9/samtools view -bS -o shangNC-1.sort_f2q30_rmdup_rmM.bam
+
+v2.2.7.1
+macs2 callpeak -g 2533271056 -t shangNC-1_sort_f2q30_rmdup.bam -f BAMPE -n shangNC-1 -B --SPMR --keep-dup all 
+
+macs2 callpeak -g 2533271056 --nomodel --shift -100 --extsize 200 -t shangNC-1_sort_f2q30_rmdup.bam -f BAMPE -n shangNC1test -B --SPMR --keep-dup all 
+preseq-3.2.0--计算文库复杂度
+preseq lc_extrap -e 1e+8 -P -B -D -v -o shangNC-1.dat shangNC-2_sort_f2q30.bam 2> A1.log
+
+
+
+/public/home/baoqi/atac/software/idr-2.0.3/bin/idr --samples shangNC-1_peaks.narrowPeak_sort.narrowPeak shangNC-2_peaks.narrowPeak_sort.narrowPeak --input-file-type narrowPeak --rank p.value --output-file shangNC1_2-idr --plot --log-output-file shangNC1_2.idr.log
+看IDR<0.05的，可以通过第5列信息过滤 
+awk '{if($5 >= 540) print $0}' xiNC2_3-idr > xiidr2_3.txt
+重复取交集
+intervene venn  -i *.idr --save-overlaps
+
+
+获得三个重复之间共有的bed，然后bed与单一的narrow取交集获得idr的peak
+intervene venn  -i  3megre.bed  shangNC-1_peaks.narrowPeak --save-overlaps
+交际部分为shangNC-1_peaks_idr.narrowPeak
