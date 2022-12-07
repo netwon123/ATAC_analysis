@@ -1,0 +1,10 @@
+dbObj.consensus=dba.peakset(dbObj,consensus = DBA_CONDITION,minOverlap = 3)
+
+dba.show(dbObj.consensus,dbObj.consensus$masks$Consensus)
+dba.plotVenn(dbObj.consensus,dbObj.consensus$masks$Consensus)
+
+
+consensus=dba.peakset(dbObj.consensus,bRetrieve = TRUE,peaks=dbObj.consensus$masks$Consensus,minOverlap =2)
+dbObj=dba.count(dbObj,peaks = consensus)
+
+#strict condition
