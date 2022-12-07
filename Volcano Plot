@@ -1,0 +1,16 @@
+setwd('G:/博士/ATAC/差异/idr/diffpeak/logFC_2/')
+library(ggplot2)
+library(ggrepel)
+#读取数据
+Dat<-read.csv('../shangNC_vs_xiNC_deseq2.txt',header = T,sep='\t')
+
+Dat$threshold = factor(ifelse(Dat$FDR < 0.05 & abs(Dat$Fold) >= 2, ifelse(Dat$Fold>= 2 ,'Up','Down'),'NoSignifi'),levels=c('Up','Down','NoSignifi'))
+pdf('spleen.pdf')
+ggplot(Dat,aes(x=Fold,y=-log10(FDR),color=threshold))+
+  geom_point()+scale_color_manual(values=c("#DC143C","#00008B","#808080"))+ theme(
+    legend.title = element_blank()#不显示图例标题
+  )+ylab('-log10 (p-adj)')+#修改y轴名称
+  xlab('log2 (FoldChange)')+#修改x轴名称
+  geom_vline(xintercept=c(-2,2),lty=3,col="black",lwd=0.5) +#添加横线|FoldChange|>2
+  geom_hline(yintercept = -log10(0.05),lty=3,col="black",lwd=0.5)#添加竖线padj<0.05
+dev.off()
