@@ -1,0 +1,16 @@
+setwd('G:/博士/ATAC/差异/idr/diffpeak/logFC_2/')
+pathway<-read.csv("KEGG.csv",header=TRUE)
+#View(pathway)
+pathway$richFactor<-pathway$Input.number/pathway$Background.number
+library(ggplot2)
+colnames(pathway)
+p<-ggplot(pathway,aes(x=richFactor,y=X.Term))
+p+geom_point()    #绘制散点图     
+
+
+
+
+pdf('t_kegg.pdf')
+p+geom_point(aes(size=Input.number,color=Corrected.P.Value))+scale_color_gradient(low="red",high="green")+labs(title="Statistics of Pathway Enrichment",x="Rich factor",y="",color="qvalue",size="Gene_number")+theme_bw()
+dev.off()
+p
