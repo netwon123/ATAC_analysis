@@ -1,7 +1,7 @@
 library(DiffBind)
 samples=read.csv('samlist.txt',sep='\t')
 dbObj =dba(sampleSheet = samples)
-dbObj <- dba.count(dbObj, bUseSummarizeOverlaps=TRUE)
+dbObj <- dba.count(dbObj, bUseSummarizeOverlaps=TRUE)#根据bam文件中reads数进行校正
 
 
 
