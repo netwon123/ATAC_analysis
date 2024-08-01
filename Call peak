@@ -11,25 +11,19 @@ done
 
 fastqc -o ./ shangNC-1.trim_1P.fq.gz
 
-
-#比对
-bowtie2-build -f Duroc.fna Duroc
+ls *gz | while read id; 
+do
+id=${id/.trim_1P.fq.gz/}}
 bowtie2 -p 16 -q -X 1000 --dovetail --no-unal --very-sensitive-local --no-mixed --no-discordant \
--x ../ref/Duroc -1 shangNC-1.trim_1P.fq.gz -2 shangNC-1.trim_2P.fq.gz > shangNC-1.sam
+-x ~/genome/Duroc -1 ${id}.trim_1P.fq.gz -2 ${id}.trim_1P.fq.gz > ${id}.sam
+done
+ 
+ 
+ls *sam | while read id;do samtools view -F 4 -u $id  | samtools sort -@ 8 -o ${id}.sorted.bam;done
+ls *bam | while read id;do samtools view -b -f 2 -q 30 -o ${id}_f2q30.bam $id;done
 
-
-~/software/samtools-1.9/samtools view -F 4 -u shangNC-1.sam > shangNC-1.bam
-~/software/samtools-1.9/samtools sort -@ 8 -o shangNC-1_sort.bam shangNC-1.bam
-
-过滤
-~/software/samtools-1.9/samtools view -b -f 2 -q 30 -o shangNC-1_sort_f2q30.bam shangNC-1.bam
-
-
-v4.2.3.0
-gatk MarkDuplicates -I shangNC-1_sort_f2q30.bam -O shangNC-1_sort_f2q30_rmdup.bam  --REMOVE_SEQUENCING_DUPLICATES true -M shangNC-1.log
-
-过滤线粒体序列
+ls *f2q30.bam | while read id;do gatk MarkDuplicates -I $id -O ${id}_rmdup.bam  --REMOVE_SEQUENCING_DUPLICATES true -M ${id}.log;done
+ 过滤线粒体序列
 ~/software/samtools-1.9/samtools view -h ../shangNC-1/shangNC-1_sort_f2q30_rmdup.bam | grep -v 'NC_000845.1' | ~/software/samtools-1.9/samtools view -bS -o shangNC-1.sort_f2q30_rmdup_rmM.bam
 
-v2.2.7.1
-macs2 callpeak -g 2533271056 -t shangNC-1_sort_f2q30_rmdup.bam -f BAMPE -n shangNC-1 -B --SPMR --keep-dup all 
+ ls *rmdup.bam | while read id;do macs3 callpeak -g 2533271056 -t $id -f BAMPE -n ${id} -B --SPMR --keep-dup all ;done
