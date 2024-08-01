@@ -1,9 +1,13 @@
 fastqc -o ./ shangNC-1.trim_1P.fq.gz
 
 #去接头Trimmomatic-0.39
-java -jar /public/home/baoqi/atac/software/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 16 -summary shangNC-1.trim.stats \
--validatePairs -baseout shangNC-1.trim.fq.gz shangNC-1_FKDL210176569-1a_1.fq.gz shangNC-1_FKDL210176569-1a_2.fq.gz \
- ILLUMINACLIP:/public/home/baoqi/atac/software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10:8:true MINLEN:8 HEADCROP:15
+ls *gz | while read id;
+do
+id=${id/_1.fq.gz/}
+java -jar ~/software/Trimmomatic-0.39/trimmomatic-0.39.jar  PE -threads 16 -summary ${id}.trim.stats \
+-validatePairs -baseout ${id}.trim.fq.gz ${id}_1.fq.gz ${id}_2.fq.gz \
+ILLUMINACLIP:/public/home/baoqi/software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10:8:true MINLEN:8 HEADCROP:15
+done
 
 fastqc -o ./ shangNC-1.trim_1P.fq.gz
 
