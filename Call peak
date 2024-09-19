@@ -13,7 +13,7 @@ fastqc -o ./ shangNC-1.trim_1P.fq.gz
 
 ls *gz | while read id; 
 do
-id=${id/.trim_1P.fq.gz/}}
+id=${id/.trim_1P.fq.gz/}
 bowtie2 -p 16 -q -X 1000 --dovetail --no-unal --very-sensitive-local --no-mixed --no-discordant \
 -x ~/genome/Duroc -1 ${id}.trim_1P.fq.gz -2 ${id}.trim_1P.fq.gz > ${id}.sam
 done
