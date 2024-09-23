@@ -35,3 +35,8 @@ out4 <- as.data.frame(comp1.deseq)
 deseq.bed <- out4[ which(out$FDR < 0.05), 
                   c("seqnames", "start", "end", "strand", "Fold")]
 write.table(deseq.bed, file="shangNC_vs_xiNC_deseq2_sig.bed", sep="\t", quote=F, row.names=F, col.names=F)
+
+
+
+#多个分组，可以指定分组
+#对照组放在在list前面
