@@ -1,0 +1,11 @@
+SampleID	Condition	Replicate	PeakCaller	bamReads	Peaks
+PT55D-EZH2	0	1	macs	PT55D-EZH2_sort.bam.rmdup.bam.rmM.bam	PT55D-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+PT55D-2-EZH2	0	2	macs	PT55D-2-EZH2_sort.bam.rmdup.bam.rmM.bam	PT55D-2-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+0D-EZH2	1	1	macs	0D-EZH2_sort.bam.rmdup.bam.rmM.bam	0D-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+0D-2-EZH2	1	2	macs	0D-2-EZH2_sort.bam.rmdup.bam.rmM.bam	0D-2-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+30D-EZH2	2	1	macs	30D-EZH2_sort.bam.rmdup.bam.rmM.bam	30D-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+30D-2-EZH2	2	2	macs	30D-2-EZH2_sort.bam.rmdup.bam.rmM.bam	30D-2-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+90D-EZH2	3	1	macs	90D-EZH2_sort.bam.rmdup.bam.rmM.bam	90D-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+90D-2-EZH2	3	2	macs	90D-2-EZH2_sort.bam.rmdup.bam.rmM.bam	90D-2-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+180-EZH2	4	1	macs	180-EZH2_sort.bam.rmdup.bam.rmM.bam	180-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
+180D-2-EZH2	4	2	macs	180D-2-EZH2_sort.bam.rmdup.bam.rmM.bam	180D-2-EZH2_sort.bam.rmdup.bam.rmM.bam_peaks.narrowPeak
